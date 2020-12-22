@@ -36,24 +36,34 @@ X = np.vstack([X1Norm, X2Norm, X3, X4, X5]).T
 splitSize=10
 
 #Finding best number of splits
-splits = [2,5,10,25,50,100]
-mean_error=[]; std_error=[]; temp=[]; scoreTemp=[]; avgScore=[]
-
 for n in splits:
     kf = KFold(n_splits=n, shuffle=True)
-    temp=[]; scoreTemp=[]
+    temp=[]; temp2=[]; scoreTemp=[]; scoreTemp2=[]
     for train, test in kf.split(X):
         model = LogisticRegression(penalty='l2', max_iter=1000, C=0.01)
         model.fit(X[train], y[train])
+        kNNModel = KNeighborsClassifier(n_neighbors = 3)
+        kNNModel.fit(X[train], y[train])
         yPred = model.predict(X[test])
+        yPredK = kNNModel.predict(X[test])
         temp.append(mean_squared_error(y[test],yPred))
+        temp2.append(mean_squared_error(y[test],yPredK))
         scoreTemp.append(model.score(X[test],y[test]))
+        scoreTemp2.append(kNNModel.score(X[test],y[test]))
     avgScore.append(np.array(scoreTemp).mean())
+    avgScore2.append(np.array(scoreTemp2).mean())
     mean_error.append(np.array(temp).mean())
+    mean_error2.append(np.array(temp2).mean())
     std_error.append(np.array(temp).std())
-print(avgScore)
-print(mean_error)
-print(std_error)
+    std_error2.append(np.array(temp).std())
+print('Logistic Regression Model')
+print(np.around((avgScore),decimals=4))
+print(np.around((mean_error),decimals=4))
+print(np.around((std_error),decimals=4))
+print('\n kNN Model')
+print(np.around((avgScore2),decimals=4))
+print(np.around((mean_error2),decimals=4))
+print(np.around((std_error2),decimals=4))
 
 print('\n','Support Vector Machine')
 #Finding the best C value
@@ -91,7 +101,7 @@ for l in range(50):
             temp.append(model.score(X[test],y[test]))
         avgScore.append(np.array(temp).mean())
     bestC.append(avgScore.index(max(avgScore)))
-print(avgScore)
+print(np.around(avgScore,decimals=4))
 print(bestC)
 
 #Plotting the scores of different C values for Logistic Regression model
@@ -107,7 +117,7 @@ for cTemp in C_range:
         scoreTemp.append(model.score(X[test],y[test]))
     avgScore.append(np.array(scoreTemp).mean())
     std_error.append(np.array(temp).std())
-print(avgScore)
+print(np.around(avgScore,decimals=4))
 plt.errorbar(C_range,avgScore,yerr=std_error,linewidth=3)
 plt.xlabel('C', fontsize=14)
 plt.ylabel('Mean Accuracy', fontsize=14)
@@ -136,7 +146,7 @@ for p in kRange:
         neigh = KNeighborsClassifier(n_neighbors=p)
         neigh.fit(Xtrain, ytrain)
         temp.append(neigh.score(Xtest,ytest))
-    print(p, ' = ', np.array(temp).mean())
+    print(p, ' = ', np.around(np.array(temp).mean(),decimals=4))
 
 #Building models and comparing accuracies
 LRTemp=[];SVMTemp=[];TreeTemp=[];kNNTemp=[];FreTemp=[];StraTemp=[]
@@ -163,12 +173,12 @@ for i in range(100):
     FreTemp.append(FreModel.score(Xtest,ytest))
     StraTemp.append(StraModel.score(Xtest,ytest))
     
-print('LR Accuracy = ', np.array(LRTemp).mean())
-print('SVM Accuracy = ', np.array(SVMTemp).mean())
-print('DT Accuracy = ', np.array(TreeTemp).mean())
-print('kNN Accuracy = ', np.array(kNNTemp).mean())
-print('MF Accuracy = ', np.array(FreTemp).mean())
-print('Stra Accuracy = ', np.array(StraTemp).mean())
+print('LR Accuracy = ', np.around(np.array(LRTemp).mean(),decimals=4))
+print('SVM Accuracy = ', np.around(np.array(SVMTemp).mean(),decimals=4))
+print('DT Accuracy = ', np.around(np.array(TreeTemp).mean(),decimals=4))
+print('kNN Accuracy = ', np.around(np.array(kNNTemp).mean(),decimals=4))
+print('MF Accuracy = ', np.around(np.array(FreTemp).mean(),decimals=4))
+print('Stra Accuracy = ', np.around(np.array(StraTemp).mean(),decimals=4))
 
 #Confusion Matrices
 Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2)
