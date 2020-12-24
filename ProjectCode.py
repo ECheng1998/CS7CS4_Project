@@ -35,6 +35,10 @@ X2Norm = (X2 - X2Mean)/X2Std
 X = np.vstack([X1Norm, X2Norm, X3, X4, X5]).T
 splitSize=10
 
+printX = np.column_stack((X,y))
+print('  total_dist, total_time, avg_speed,  min_speed,  max_speed,  target')
+print(printX[:6])
+
 #Finding best number of splits
 for n in splits:
     kf = KFold(n_splits=n, shuffle=True)
@@ -341,6 +345,6 @@ plt.ylim([0.0, 1.05])
 plt.xlabel('False Positive Rate', fontsize=14)
 plt.ylabel('True Positive Rate', fontsize=14)
 plt.title('Micro-Averaged ROC Curves', fontsize=14)
-plt.legend(loc="lower right")
+plt.legend(loc="lower right", prop={'size': 16})
 plt.grid()
 plt.show()
