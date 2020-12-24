@@ -72,10 +72,10 @@ print(np.around((std_error2),decimals=4))
 print('\n','Support Vector Machine')
 #Finding the best C value
 C_range = [0.00001,0.0001,0.001,0.01]
-kf = KFold(n_splits=splitSize, shuffle=True)
 mean_error=[]; bestC=[]; temp=[]
 
 for l in range(50):
+    kf = KFold(n_splits=splitSize, shuffle=True)
     avgScore=[]
     for cTemp in C_range:
         temp=[];
@@ -91,10 +91,10 @@ print(bestC)
 print('\n','Logistic Regression')
 #Finding best C
 C_range = [0.0001,0.001,0.01,0.1,1,10,100]
-kf = KFold(n_splits=splitSize, shuffle=True)
 bestC=[]; temp=[]
 
 for l in range(50):
+    kf = KFold(n_splits=splitSize, shuffle=True)
     avgScore=[]
     for cTemp in C_range:
         temp=[];
@@ -142,15 +142,26 @@ tree.plot_tree(TreeModel)
 
 print('\n','kNN Model')
 #Finding best k
+#Finding best k
 kRange=[3,5,7,9,11,13,15,17]
-for p in kRange:
-    temp=[]
-    for i in range(100):
-        Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, shuffle=True)
-        neigh = KNeighborsClassifier(n_neighbors=p)
-        neigh.fit(Xtrain, ytrain)
-        temp.append(neigh.score(Xtest,ytest))
-    print(p, ' = ', np.around(np.array(temp).mean(),decimals=4))
+
+splitSize=5
+bestC=[]; temp=[]
+
+for l in range(50):
+    kf = KFold(n_splits=splitSize, shuffle=True)
+    avgScore=[]
+    for k in kRange:
+        temp=[];
+        for train, test in kf.split(X):
+            model = KNeighborsClassifier(n_neighbors=k)
+            model.fit(X[train], y[train])
+            yPred = model.predict(X[test])
+            temp.append(model.score(X[test],y[test]))
+        avgScore.append(np.array(temp).mean())
+    bestC.append(avgScore.index(max(avgScore)))
+print(avgScore)
+print(bestC)
 
 #Building models and comparing accuracies
 LRTemp=[];SVMTemp=[];TreeTemp=[];kNNTemp=[];FreTemp=[];StraTemp=[]
